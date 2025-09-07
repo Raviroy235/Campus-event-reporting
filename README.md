@@ -21,67 +21,18 @@ It is not a full-fledged web or mobile app, but just the backend with APIs and s
   - Event statistics  
 
 ---
+### Setup & Run
 
-## Setup & Run
+To run this project, first create a Python virtual environment and activate it. Then install the required packages from requirements.txt. After that, start the FastAPI app using uvicorn app.main:app --reload. Once it’s running, open your browser and go to http://127.0.0.1:8000/docs to try out the APIs. You can also test them using Postman or curl if you prefer.
 
-Follow these steps to set up the project locally:
+### Testing
 
-### 1. Clone the repository
-```bash
-git clone <repo_url>
-cd <repo_name>
+You can test the APIs using the Swagger UI at /docs in your browser. If you like, you can also use Postman or curl to send requests and see how it works.
 
-### 2. Create and activate virtual environment
-```bash
-python -m venv venv
+### Limitations
 
-# Windows
-venv\Scripts\activate
+Right now, there’s no login or authentication system. The reports are simple text and don’t have any graphs. Also, SQLite is used, so it’s not meant for large-scale use.
 
-# Linux/Mac
-source venv/bin/activate
-3. Install dependencies
-bash
-Copy code
-pip install -r requirements.txt
-4. Run the FastAPI app
-bash
-Copy code
-uvicorn app.main:app --reload
-5. Open your browser
-Go to:
+### Future Improvements
 
-arduino
-Copy code
-http://127.0.0.1:8000/docs
-to test the APIs with Swagger UI.
-
-Testing
-You can test the APIs in two ways:
-
-Swagger UI (auto-generated at /docs)
-
-Postman / curl for sending custom requests
-
-Example:
-
-bash
-Copy code
-curl -X POST "http://127.0.0.1:8000/students/" \
-     -H "Content-Type: application/json" \
-     -d '{"name": "John Doe", "college_id": 1}'
-Limitations
-No authentication or login system yet
-
-Reports are basic text output (no visualizations)
-
-Not optimized for scaling (SQLite is used just for simplicity)
-
-Future Improvements
-Add authentication (JWT, role-based access)
-
-Build a simple frontend or mobile client
-
-Improve reporting with dashboards/graphs
-
-Migrate from SQLite to PostgreSQL/MySQL for scalability
+In the future, I’d like to add login/authentication, maybe make a frontend or mobile app, improve reports with dashboards or graphs, and switch to a bigger database like PostgreSQL for scalability.
