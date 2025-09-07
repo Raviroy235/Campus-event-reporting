@@ -20,7 +20,6 @@ It is not a full-fledged web or mobile app, but just the backend with APIs and s
   - Top active students  
   - Event statistics  
 
----
 ### Setup & Run
 
 To run this project, first create a Python virtual environment and activate it. Then install the required packages from requirements.txt. After that, start the FastAPI app using uvicorn app.main:app --reload. Once it’s running, open your browser and go to http://127.0.0.1:8000/docs to try out the APIs. You can also test them using Postman or curl if you prefer.
