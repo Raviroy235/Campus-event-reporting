@@ -1,105 +1,146 @@
-Campus Event Reporting – Design Document
-1. Overview
+# Campus Event Reporting – Design Document
 
-This is a small prototype for a campus event reporting system.
-It allows college staff to create events, students to register, mark attendance, and give feedback.
-Reports can be generated for event popularity, student participation, and top active students.
+## 1. Overview
+This is a small prototype for a campus event reporting system.  
+It allows college staff to create events, students to register, mark attendance, and give feedback.  
+Reports can be generated for:  
+- Event popularity  
+- Student participation  
+- Top active students  
 
-2. Database Design (ER / Schema)
-Tables
+---
 
-Colleges
+## 2. Database Design (ER / Schema)
 
-Column	Type	Notes
-id	INT PK	Auto increment
-name	TEXT	College name
-code	TEXT	Short code (optional)
+### **Colleges**
+| Column | Type | Notes |
+|--------|------|------|
+| id     | INT PK | Auto increment |
+| name   | TEXT   | College name |
+| code   | TEXT   | Short code (optional) |
 
-Students
+### **Students**
+| Column | Type | Notes |
+|--------|------|------|
+| id         | INT PK | Auto increment |
+| name       | TEXT   | Student name |
+| email      | TEXT   | Student email |
+| roll_no    | TEXT   | Unique per college |
+| college_id | INT FK | Links to Colleges table |
 
-Column	Type	Notes
-id	INT PK	Auto increment
-name	TEXT	Student name
-email	TEXT	Student email
-roll_no	TEXT	Unique per college
-college_id	INT FK	Links to Colleges table
+### **Events**
+| Column     | Type | Notes |
+|------------|------|------|
+| id         | INT PK | Auto increment (unique globally) |
+| title      | TEXT   | Event title |
+| type       | TEXT   | Workshop/Fest/Seminar |
+| college_id | INT FK | Links to Colleges table |
+| start_time | DATETIME | Event start time |
+| end_time   | DATETIME | Event end time |
 
-Events
+### **Registrations**
+| Column     | Type | Notes |
+|------------|------|------|
+| id         | INT PK | Auto increment |
+| event_id   | INT FK | Links to Events table |
+| student_id | INT FK | Links to Students table |
 
-Column	Type	Notes
-id	INT PK	Auto increment (unique globally)
-title	TEXT	Event title
-type	TEXT	Workshop/Fest/Seminar
-college_id	INT FK	Links to Colleges table
-start_time	DATETIME	Event start time
-end_time	DATETIME	Event end time
+- Unique constraint: `(event_id, student_id)`
 
-Registrations
+### **Attendance**
+| Column     | Type | Notes |
+|------------|------|------|
+| id         | INT PK | Auto increment |
+| event_id   | INT FK | Links to Events table |
+| student_id | INT FK | Links to Students table |
+| present    | BOOL   | True/False |
 
-Column	Type	Notes
-id	INT PK	Auto increment
-event_id	INT FK	Links to Events table
-student_id	INT FK	Links to Students table
+### **Feedback**
+| Column     | Type | Notes |
+|------------|------|------|
+| id         | INT PK | Auto increment |
+| event_id   | INT FK | Links to Events table |
+| student_id | INT FK | Links to Students table |
+| rating     | INT    | 1-5 |
+| comments   | TEXT   | Optional |
 
-Unique constraint: (event_id, student_id)
+> One feedback per `(event, student)`
 
-Attendance
+---
 
-Column	Type	Notes
-id	INT PK	Auto increment
-event_id	INT FK	Links to Events table
-student_id	INT FK	Links to Students table
-present	BOOL	True/False
+## 3. API Endpoints
 
-Feedback
+### College
+**POST /colleges** → create new college  
 
-Column	Type	Notes
-id	INT PK	Auto increment
-event_id	INT FK	Links to Events table
-student_id	INT FK	Links to Students table
-rating	INT	1-5
-comments	TEXT	Optional
+```json
+{
+  "name": "ABC College",
+  "code": "ABC"
+}
+```
+### Student
 
-One feedback per (event, student)
+**POST /students** → create student  
 
-3. API Endpoints
+```json
+{
+  "name": "John",
+  "email": "john@x.com",
+  "roll_no": "CS101",
+  "college_id": 1
+}
+```
 
-College
+### Event
 
-POST /colleges → create new college
+**POST /events** → create event
 
-{"name":"ABC College","code":"ABC"}
+```json
+{
+  "title": "Intro to AI",
+  "type": "Workshop",
+  "college_id": 1,
+  "start_time": "2025-09-10T09:00:00",
+  "end_time": "2025-09-10T12:00:00"
+}
+```
 
+### Registration / Attendance / Feedback
 
-Student
+***POST /events/{id}/register*** → register student
+```json
+{
+  "student_id": 1
+}
+```
 
-POST /students → create student
+**POST /events/{id}/attendance*** → mark attendance
+```json
+{
+  "student_id": 1,
+  "present": true
+}
+```
 
-{"name":"John","email":"john@x.com","roll_no":"CS101","college_id":1}
+***POST /events/{id}/feedback*** → submit feedback
+```json
+{
+  "student_id": 1,
+  "rating": 4,
+  "comments": "Good"
+}
+```
 
-
-Event
-
-POST /events → create event
-
-{"title":"Intro to AI","type":"Workshop","college_id":1,"start_time":"2025-09-10T09:00:00","end_time":"2025-09-10T12:00:00"}
-
-
-Registration / Attendance / Feedback
-
-POST /events/{id}/register → register student (body: {"student_id":1})
-
-POST /events/{id}/attendance → mark attendance (body: {"student_id":1,"present":true})
-
-POST /events/{id}/feedback → submit feedback (body: `{"student_id":1,"rating":4,"comments":"Good"}')
-
-Reports
+### Reports
 
 GET /reports/event_popularity?college_id=1&event_type=Workshop
 
 GET /reports/event_stats/{event_id}
 
-4. Workflow (Sequence)
+## 4. Workflow (Sequence Diagram)
+
+```mermaid
 sequenceDiagram
     participant Student
     participant API
@@ -120,27 +161,28 @@ sequenceDiagram
     API->>DB: insert feedback
     DB-->>API: ok
     API-->>Student: 200 feedback recorded
+```
 
-5. Design Decisions & Assumptions
+## 5. Design Decisions & Assumptions
 
-Single database for all colleges to make cross-college reporting easier
+Single database for all colleges (easier for cross-college reporting)
 
 Event IDs are unique globally
 
 Registration is unique per student per event
 
-Attendance table separate for tracking trends
+Attendance table separate to track trends
 
 Feedback limited to one per student per event
 
-Marking attendance auto-registers student if missing (for on-spot check-in)
+Marking attendance auto-registers student if missing (on-spot check-in)
 
-6. Limitations / Future Improvements
+## 6. Limitations / Future Improvements
 
-No authentication / roles yet
+No authentication or roles yet
 
 SQLite used, so not optimized for large scale
 
-Reports are basic text (no graphs or dashboards)
+Reports are basic text (no graphs/dashboards)
 
-Future: JWT auth, frontend/mobile client, PostgreSQL/MySQL, visual dashboards
+Future improvements: JWT auth, frontend/mobile client, PostgreSQL/MySQL, visual dashboards
