@@ -165,24 +165,16 @@ sequenceDiagram
 
 ## 5. Design Decisions & Assumptions
 
-Single database for all colleges (easier for cross-college reporting)
-
-Event IDs are unique globally
-
-Registration is unique per student per event
-
-Attendance table separate to track trends
-
-Feedback limited to one per student per event
-
-Marking attendance auto-registers student if missing (on-spot check-in)
+- Single database for all colleges (easier for cross-college reporting)
+- Event IDs are unique globally
+- Registration is unique per student per event
+- Attendance table separate to track trends
+- Feedback limited to one per student per event
+- Marking attendance auto-registers student if missing (on-spot check-in)
 
 ## 6. Limitations / Future Improvements
 
-No authentication or roles yet
-
-SQLite used, so not optimized for large scale
-
-Reports are basic text (no graphs/dashboards)
-
-Future improvements: JWT auth, frontend/mobile client, PostgreSQL/MySQL, visual dashboards
+- No authentication or roles yet
+- SQLite used, so not optimized for large scale
+- Reports are basic text (no graphs/dashboards)
+- Future improvements: JWT auth, frontend/mobile client, PostgreSQL/MySQL, visual dashboards
